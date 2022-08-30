@@ -6,10 +6,10 @@ EXPOSE 80
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
-COPY ["TestMaker.ApiGateway.csproj", "."]
-RUN dotnet restore "./TestMaker.ApiGateway.csproj"
+COPY ["TestMaker.ApiGateway/TestMaker.ApiGateway.csproj", "."]
+RUN dotnet restore "./TestMaker.ApiGateway/TestMaker.ApiGateway.csproj"
 COPY . .
-WORKDIR "/src/."
+WORKDIR "/src/TestMaker.ApiGateway"
 RUN dotnet build "TestMaker.ApiGateway.csproj" -c Release -o /app/build
 
 FROM build AS publish
