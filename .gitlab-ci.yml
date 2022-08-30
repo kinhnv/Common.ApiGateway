@@ -5,7 +5,6 @@ variables:
 stages:
   - build
   - update_github
-  - test
   - update_gitops
 
 before_script:
