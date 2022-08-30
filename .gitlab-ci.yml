@@ -36,7 +36,7 @@ update-gitops:
   stage: update_gitops
   only:
     - master
-  needs: [test]
+  needs: [build]
   script:
     - git clone $GITOPS_URL 
     - cd GitOps
