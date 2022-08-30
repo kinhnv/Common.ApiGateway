@@ -1,0 +1,7 @@
+version: '3.3'
+services:
+  api-gateway:
+    image: $REGISTRY/test-maker.api-gateway:${VERSION}
+    build:
+      context: .
+      dockerfile: ./TestMaker.ApiGateway/Dockerfile  

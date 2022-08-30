@@ -1,0 +1,42 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.2.32616.157
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Libraries", "Libraries", "{2F1928C9-B727-4A75-8E81-8B1BAE6408ED}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestMaker.ApiGateway", "TestMaker.ApiGateway\TestMaker.ApiGateway.csproj", "{55FFD6D4-273D-4F05-AEE6-C49AD8C36698}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ocelot.ClientGateway", "Libraries\Ocelot.ClientGateway\Ocelot.ClientGateway.csproj", "{EF055FB3-101C-42BB-9294-40865C3FE9D9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{3876EAC7-9E9E-4941-9EF0-1C5BE64AE06A}"
+	ProjectSection(SolutionItems) = preProject
+		.gitlab-ci.yml = .gitlab-ci.yml
+		docker-compose.yml = docker-compose.yml
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{55FFD6D4-273D-4F05-AEE6-C49AD8C36698}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{55FFD6D4-273D-4F05-AEE6-C49AD8C36698}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{55FFD6D4-273D-4F05-AEE6-C49AD8C36698}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{55FFD6D4-273D-4F05-AEE6-C49AD8C36698}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EF055FB3-101C-42BB-9294-40865C3FE9D9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EF055FB3-101C-42BB-9294-40865C3FE9D9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EF055FB3-101C-42BB-9294-40865C3FE9D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EF055FB3-101C-42BB-9294-40865C3FE9D9}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{EF055FB3-101C-42BB-9294-40865C3FE9D9} = {2F1928C9-B727-4A75-8E81-8B1BAE6408ED}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {94ABD8AE-2ACC-49C2-A2CB-F9EA54E8320F}
+	EndGlobalSection
+EndGlobal
