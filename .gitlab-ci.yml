@@ -1,52 +1,83 @@
 variables:
   VERSION: "$CI_PIPELINE_ID"
   ASPNETCORE_ENVIRONMENT: "Production"
-  SPACE: " "
 
 stages:
   - build
-  - update_github
-  - update_gitops
+  - test
+  - deploy
 
-before_script:
-  - eval "$(ssh-agent -s)"
-  - cat ~/.ssh/id_rsa | ssh-add - > /dev/null
-  - ssh-keyscan github.com >> ~/.ssh/known_hosts
+.build_tags:
+  tags:
+    - "docker"
+
+.deploy_tags:
+  tags:
+    - "shell"
+
+.prepare_git:
+  before_script:
+    - eval "$(ssh-agent -s)"
+    - cat ~/.ssh/id_rsa | ssh-add - > /dev/null
+    - ssh-keyscan github.com >> ~/.ssh/known_hosts
+    - git config --global user.email "kinhnv1801@gmail.com"
+    - git config --global user.name "Nguyen Van Kinh"
+
+.push_github:
+  extends:
+    - .prepare_git
+  before_script:
+    - git remote set-url origin $GITHUB_URL 
+    - git push origin HEAD:master
 
 build:
   stage: build
+  extends:
+    - .build_tags
+    - .push_github
   only:
     - master
+  image:
+    name: $REGISTRY/kaniko-project/executor:v1.9.0-debug
+    entrypoint: [""]
+  before_script:
+    - sed -i "s/pre-build-params_registry/$REGISTRY/g" ./**/Dockerfile
   script:
-    - docker-compose build
-    - docker-compose push
+    - /kaniko/executor
+      --context "${CI_PROJECT_DIR}"
+      --dockerfile "${CI_PROJECT_DIR}/TestMaker.ApiGateway/Dockerfile"
+      --destination "$REGISTRY/test-maker.api-gateway:${VERSION}"
+      --skip-tls-verify
+      --cache=true
+      --cache-copy-layers=true
+      --snapshotMode=redo
+      --use-new-run
 
-update-github:
-  stage: update_github
-  only:
-    - master
-  script:
-    - ssh git@github.com || true
-    - git remote remove origin && git remote add origin $GITHUB_URL
-    - git config --global --add safe.directory $(pwd)
-    - git fetch --unshallow $GITHUB_URL || true
-    - git push origin HEAD:master -f
-    - git config --global --unset safe.directory $(pwd) || true
-            
-update-gitops:
-  stage: update_gitops
+test:
+  stage: test
+  extends:
+    - .build_tags
   only:
     - master
   needs: [build]
   script:
+    - echo "test"
+    # - docker build -t test-business:latest -f TestMaker.TestService.UnitTests/Dockerfile .
+    # - docker run --rm -t test-business:latest dotnet test --logger:"console;verbosity=normal"
+    # - docker image rm test-business:latest
+        
+deploy:
+  stage: deploy
+  extends:
+    - .deploy_tags
+    - .prepare_git
+  only:
+    - master
+  needs: [test]
+  script:
     - git clone $GITOPS_URL 
-    - cd GitOps
-    - git config --global --add safe.directory $(pwd)
-    - git checkout -b test-maker origin/test-maker
-    - sed -i "s/image:\s.*\/test-maker.api-gateway:[0-9]*/image:$SPACE$REGISTRY\/test-maker.api-gateway:$VERSION/g" ./setup/api-gateway.deployment.yml
-    - git add ./setup/api-gateway.deployment.yml
-    - git config --global user.email "kinhnv1801@gmail.com"
-    - git config --global user.name "Nguyen Van Kinh"
+    - cd gitops
+    - yq eval ".servers.apiGateway.tag = \"${VERSION}\"" -i ./test-maker/values.yaml
+    - git add ./test-maker/values.yaml
     - git commit -m "change to version $VERSION"
-    - git push origin test-maker
-    - git config --global --unset safe.directory $(pwd) || true
+    - git push
