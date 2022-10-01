@@ -7,7 +7,7 @@ EXPOSE 443
 
 FROM pre-build-params_registry/dotnet/sdk:6.0 AS build
 WORKDIR /src
-COPY Ocelot.ClientGateway Ocelot.ClientGateway
+COPY Libraries Libraries
 COPY TestMaker.ApiGateway TestMaker.ApiGateway
 RUN dotnet restore "TestMaker.ApiGateway/TestMaker.ApiGateway.csproj"
 WORKDIR "/src/TestMaker.ApiGateway"
