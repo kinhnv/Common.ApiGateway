@@ -43,15 +43,9 @@ build:
   before_script:
     - sed -i "s/pre-build-params_registry/$REGISTRY/g" ./**/Dockerfile
   script:
-    - /kaniko/executor
-      --context "${CI_PROJECT_DIR}"
-      --dockerfile "${CI_PROJECT_DIR}/TestMaker.ApiGateway/Dockerfile"
-      --destination "$REGISTRY/test-maker.api-gateway:${VERSION}"
-      --skip-tls-verify
-      --cache=true
-      --cache-copy-layers=true
-      --snapshotMode=redo
-      --use-new-run
+    - docker build -t $REGISTRY/test-maker.api-gateway:${VERSION} ${CI_PROJECT_DIR} -f ${CI_PROJECT_DIR}/TestMaker.ApiGateway/Dockerfile
+    - docker push $REGISTRY/test-maker.api-gateway:${VERSION}
+    - docker image rm $REGISTRY/test-maker.api-gateway:${VERSION}
 
 test:
   stage: test
