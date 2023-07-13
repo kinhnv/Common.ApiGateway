@@ -15,14 +15,14 @@ stages:
 
 .deploy_tags:
   tags:
-    - "shell"
+    - "shell"s
 
 build:
   stage: build
   extends:
     - .build_tags
   only:
-    - master
+    - main
   image:
     name: $REGISTRY/kaniko-project/executor:v1.9.0-debug
     entrypoint: [""]
@@ -38,7 +38,7 @@ test:
   extends:
     - .build_tags
   only:
-    - master
+    - main
   needs: [build]
   script:
     - echo "test"
@@ -49,7 +49,7 @@ deploy:
     - .deploy_tags
     - .prepare_ssh
   only:
-    - master
+    - main
   needs: [test]
   script:
     - git clone $GITOPS_URL 
