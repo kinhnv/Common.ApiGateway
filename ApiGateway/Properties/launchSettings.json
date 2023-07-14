@@ -8,7 +8,7 @@
     }
   },
   "profiles": {
-    "TestMaker.ApiGateway": {
+    "ApiGateway": {
       "commandName": "Project",
       "launchBrowser": true,
       "environmentVariables": {

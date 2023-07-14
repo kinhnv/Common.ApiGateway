@@ -26,9 +26,9 @@ build:
   before_script:
     - sed -i "s/pre-build-params_registry/$REGISTRY/g" ./**/Dockerfile
   script:
-    - docker build -t $REGISTRY/test-maker.api-gateway:${VERSION} ${CI_PROJECT_DIR} -f ${CI_PROJECT_DIR}/TestMaker.ApiGateway/Dockerfile
-    - docker push $REGISTRY/test-maker.api-gateway:${VERSION}
-    - docker image rm $REGISTRY/test-maker.api-gateway:${VERSION}
+    - docker build -t $REGISTRY/common.api-gateway:${VERSION} ${CI_PROJECT_DIR} -f ${CI_PROJECT_DIR}/ApiGateway/Dockerfile
+    - docker push $REGISTRY/common.api-gateway:${VERSION}
+    - docker image rm $REGISTRY/common.api-gateway:${VERSION}
 
 test:
   stage: test
@@ -51,8 +51,8 @@ deploy:
   script:
     - git clone $GITOPS_URL 
     - cd gitops
-    - yq eval ".servers.apiGateway.tag = \"${VERSION}\"" -i ./test-maker/values.yaml
-    - git add ./test-maker/values.yaml
+    - yq eval ".servers.apiGateway.tag = \"${VERSION}\"" -i ./common/values.yaml
+    - git add ./common/values.yaml
     - git commit -m "change to version $VERSION"
     - git push
     - cd .. && rm -rf gitops
