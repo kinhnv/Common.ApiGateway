@@ -1,68 +1,49 @@
-include: 'https://raw.githubusercontent.com/kinhnv/Platform.Common/main/pipeline/.prepare-ssh.yml'
-
-variables:
-  VERSION: "$CI_PIPELINE_ID"
-  ASPNETCORE_ENVIRONMENT: "Production"
+include: 
+  - "https://raw.githubusercontent.com/kinhnv/Platform.Common/main/pipeline/.prepare-ssh.yml"
+  - "https://raw.githubusercontent.com/kinhnv/Platform.Common/main/pipeline/.dotnet.yml"
 
 stages:
   - build
   - test
   - deploy
 
-.build_tags:
-  tags:
-    - "shell"
+.production_config:
+  variables:
+    ASPNETCORE_ENVIRONMENT: "Production"
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
 
 .deploy_tags:
   tags:
     - "shell"
-
+  
 build:
   stage: build
+  variables:
+    VERSION: ${CI_PIPELINE_ID}
+    DOCKERFILE: ${CI_PROJECT_DIR}/ApiGateway/Dockerfile
+    IMAGE: registry.gitlab.com/i3rothers/test-maker/test-service:${CI_PIPELINE_ID}
   extends:
-    - .build_tags
-  only:
-    - main
-  before_script:
-    - sed -i "s/pre-build-params_registry/$REGISTRY/g" ./**/Dockerfile
-  script:
-    - docker build -t $REGISTRY/common.api-gateway:${VERSION} ${CI_PROJECT_DIR} -f ${CI_PROJECT_DIR}/ApiGateway/Dockerfile
-    - docker push $REGISTRY/common.api-gateway:${VERSION}
-    - docker image rm $REGISTRY/common.api-gateway:${VERSION}
+    - .production_config
+    - .dotnet_build
 
 test:
   stage: test
-  extends:
-    - .build_tags
+  tags:
+    - "test"
   only:
     - main
-  needs: [build]
+  extends:
+    - .production_config
   script:
     - echo "test"
-        
+
 deploy:
   stage: deploy
+  variables:
+    VERSION: ${CI_PIPELINE_ID}
+    TAG_CONFIG: .servers.apiGateway.tag
+    VALUE_YAML_FILE: common/values.yaml
   extends:
-    - .deploy_tags
-    - .prepare_ssh
-  only:
-    - main
-  needs: [test]
-  script:
-    - git clone $GITOPS_URL 
-    - cd gitops
-    - yq eval ".servers.apiGateway.tag = \"${VERSION}\"" -i ./common/values.yaml
-    - git add ./common/values.yaml
-    - git commit -m "change to version $VERSION"
-    - git push
-    - cd .. && rm -rf gitops
-    - git remote set-url origin $GITHUB_URL
-    - >
-      if [ `git branch --list main` ]; then
-        echo "push to existing branch"; 
-        git push -u origin HEAD:main;
-      else
-        echo "create new branch";
-        git checkout -b main; 
-        git push -u origin main;
-      fi
+    - .production_config
+    - .dotnet_deploy
