@@ -22,7 +22,7 @@ build:
   variables:
     VERSION: ${CI_PIPELINE_ID}
     DOCKERFILE: ${CI_PROJECT_DIR}/ApiGateway/Dockerfile
-    IMAGE: registry.gitlab.com/i3rothers/test-maker/test-service:${CI_PIPELINE_ID}
+    IMAGE: registry.gitlab.com/i3rothers/common/api-gateway:${CI_PIPELINE_ID}
   extends:
     - .production_config
     - .dotnet_build
