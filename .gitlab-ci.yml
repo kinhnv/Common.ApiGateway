@@ -31,8 +31,6 @@ test:
   stage: test
   tags:
     - "test"
-  only:
-    - main
   extends:
     - .production_config
   script:
