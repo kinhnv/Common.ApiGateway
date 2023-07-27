@@ -30,7 +30,7 @@ build:
 test:
   stage: test
   tags:
-    - "test"
+    - "shell"
   extends:
     - .production_config
   script:
